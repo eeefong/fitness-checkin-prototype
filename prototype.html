@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>健身打卡 · 可点击原型</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --primary: #00b578;
+    --primary-light: #3dd598;
+    --primary-dark: #00965e;
+    --primary-bg: #e8faf2;
+    --text-1: #1d2129;
+    --text-2: #4e5969;
+    --text-3: #86909c;
+    --text-disabled: #c9cdd4;
+    --bg-page: #f5f8f6;
+    --border: #e5e6eb;
+    --divider: #f2f3f5;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    background: #eef1f4;
+    display: flex;
+    min-height: 100vh;
+    color: var(--text-1);
+  }
+
+  /* ===== 左侧原型导航面板 ===== */
+  .proto-nav {
+    width: 240px;
+    padding: 32px 20px;
+    flex-shrink: 0;
+  }
+  .proto-nav h1 { font-size: 17px; font-weight: 700; }
+  .proto-nav .sub { font-size: 12px; color: var(--text-3); margin-top: 4px; }
+  .proto-nav .list { margin-top: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .proto-nav button {
+    text-align: left;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text-2);
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .proto-nav button:hover { border-color: var(--primary); color: var(--primary-dark); }
+  .proto-nav button.active { border-color: var(--primary); background: var(--primary-bg); color: var(--primary-dark); font-weight: 600; }
+  .proto-nav .step { display: block; font-size: 11px; color: var(--text-3); margin-top: 3px; font-weight: 400; }
+  .proto-nav .tip { margin-top: 20px; font-size: 12px; color: var(--text-3); line-height: 1.7; }
+
+  /* ===== 手机外框 ===== */
+  .stage { flex: 1; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+  .phone {
+    width: 375px;
+    height: 760px;
+    background: #fff;
+    border-radius: 40px;
+    box-shadow: 0 24px 64px rgba(0,0,0,.18), 0 0 0 10px #1c1e21, 0 0 0 12px #3a3d42;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .statusbar {
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 28px;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--primary);
+    color: #fff;
+  }
+  .statusbar .icons { font-size: 12px; letter-spacing: 2px; }
+  .navbar {
+    height: 48px;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+    font-weight: 600;
+  }
+  .screen {
+    display: none;
+    height: calc(100% - 44px - 48px - 58px);
+    overflow-y: auto;
+    background: linear-gradient(180deg, #dff6ec 0%, var(--bg-page) 190px);
+    position: relative;
+  }
+  .screen.active { display: block; }
+  .page-inner { padding: 24px 16px 32px; }
+
+  /* ===== 首页 ===== */
+  .date-text { font-size: 12px; color: var(--text-3); }
+  .hero-title { margin-top: 6px; font-size: 30px; font-weight: 700; line-height: 1.3; }
+  .hero-title .num { color: var(--primary); }
+  .hero-sub { margin-top: 6px; font-size: 14px; color: var(--text-2); }
+
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,.07);
+  }
+  .status-card { margin-top: 24px; padding: 18px 16px; }
+  .status-title { font-size: 12px; color: var(--text-3); }
+  .status-row { margin-top: 14px; display: flex; align-items: center; }
+  .status-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .status-divider { width: 1px; height: 44px; background: var(--divider); }
+  .status-label { font-size: 12px; color: var(--text-2); }
+  .status-time { font-size: 19px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .status-time.empty { color: var(--text-disabled); }
+
+  .actions { margin-top: 24px; display: flex; flex-direction: column; gap: 12px; }
+  .action-btn {
+    height: 52px;
+    border-radius: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: all .2s;
+    user-select: none;
+  }
+  .action-btn:active { opacity: .9; transform: scale(.98); }
+  .action-start { background: linear-gradient(135deg, var(--primary), var(--primary-light)); }
+  .action-start .label { color: #fff; font-size: 16px; font-weight: 600; }
+  .action-start .value { color: rgba(255,255,255,.85); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .action-end { background: #fff; border: 1.5px solid var(--primary); }
+  .action-end .label { color: var(--primary-dark); font-size: 16px; font-weight: 600; }
+  .action-end .value { color: var(--text-3); font-size: 14px; font-variant-numeric: tabular-nums; }
+  .rule-tip { margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-3); }
+
+  /* ===== 周报页 ===== */
+  .hero-card { margin-top: 8px; padding: 26px 20px; display: flex; flex-direction: column; align-items: center; }
+  .hero-label { font-size: 14px; color: var(--text-2); }
+  .hero-number-row { margin-top: 8px; display: flex; align-items: baseline; gap: 6px; }
+  .hero-number { font-size: 60px; font-weight: 700; color: var(--primary); line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .hero-unit { font-size: 18px; font-weight: 600; }
+  .hero-range { margin-top: 8px; font-size: 12px; color: var(--text-3); }
+  .progress-row { margin-top: 18px; width: 100%; display: flex; align-items: center; gap: 12px; }
+  .progress-track { flex: 1; height: 8px; border-radius: 999px; background: var(--divider); overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--primary), var(--primary-light)); }
+  .progress-text { font-size: 12px; color: var(--text-2); white-space: nowrap; }
+
+  .week-card { margin-top: 12px; padding: 16px 12px; }
+  .week-title { font-size: 14px; font-weight: 600; padding: 0 4px; }
+  .week-grid { margin-top: 14px; display: flex; }
+  .day-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 7px; }
+  .day-label { font-size: 11px; color: var(--text-3); }
+  .day-dot {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600;
+  }
+  .day-dot.qualified { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; }
+  .day-dot.plain { background: var(--divider); }
+  .day-dot.today { border: 1.5px solid var(--primary); background: #fff; }
+  .day-dot.today::after { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+  .day-num { font-size: 11px; color: var(--text-2); }
+  .day-num.today { color: var(--primary); font-weight: 600; }
+
+  .rule-card { margin-top: 12px; padding: 16px; }
+  .rule-title { font-size: 14px; font-weight: 600; }
+  .rule-item { margin-top: 10px; display: flex; gap: 8px; align-items: flex-start; }
+  .rule-bullet { width: 6px; height: 6px; border-radius: 50%; background: var(--primary); margin-top: 6px; flex-shrink: 0; }
+  .rule-text { font-size: 12px; color: var(--text-2); line-height: 1.6; }
+
+  /* ===== 底部 TabBar ===== */
+  .tabbar {
+    height: 58px;
+    background: #fff;
+    border-top: 1px solid var(--divider);
+    display: flex;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+  }
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    cursor: pointer;
+    color: #999;
+    font-size: 11px;
+  }
+  .tab-item.active { color: var(--primary); }
+  .tab-item svg { width: 22px; height: 22px; }
+
+  /* ===== 弹窗 ===== */
+  .overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+  .mask { position: absolute; inset: 0; background: rgba(0,0,0,.45); }
+  .modal-card {
+    position: relative;
+    width: 300px;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 8px 28px rgba(0,0,0,.16);
+    padding: 26px 22px 22px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .modal-title { font-size: 16px; font-weight: 600; }
+  .time-row {
+    margin-top: 20px;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 14px 26px;
+    background: var(--primary-bg);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .time-row:active { opacity: .85; transform: scale(.98); }
+  .time-value { font-size: 34px; font-weight: 700; color: var(--primary-dark); font-variant-numeric: tabular-nums; }
+  .time-edit { font-size: 12px; color: var(--primary); }
+  .modal-desc { margin-top: 14px; font-size: 12px; color: var(--text-3); }
+  .modal-actions { margin-top: 24px; width: 100%; display: flex; gap: 12px; }
+  .btn {
+    flex: 1; height: 42px; border-radius: 21px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; cursor: pointer; transition: all .2s; user-select: none;
+  }
+  .btn:active { opacity: .9; transform: scale(.98); }
+  .btn-cancel { border: 1px solid var(--border); color: var(--text-2); background: #fff; }
+  .btn-confirm { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-weight: 600; }
+  .btn-ok { background: linear-gradient(135deg, var(--primary), var(--primary-light)); color: #fff; font-weight: 600; width: 100%; }
+  .invalid-text { margin-top: 14px; font-size: 14px; color: var(--text-2); text-align: center; line-height: 1.7; }
+
+  @media (max-width: 720px) {
+    .proto-nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- 原型导航面板（非小程序内容） -->
+<nav class="proto-nav">
+  <h1>健身打卡 · 原型</h1>
+  <p class="sub">可点击原型 / 假数据</p>
+  <div class="list">
+    <button data-goto="home" class="active">首页（有历史数据）<span class="step">最短路径 · 第 1 步</span></button>
+    <button data-goto="home-empty">首页（首次 · 今天开始）<span class="step">边界态 · 无历史数据</span></button>
+    <button data-goto="modal">时间确认弹窗<span class="step">最短路径 · 第 2 步</span></button>
+    <button data-goto="invalid">23 点后打卡无效<span class="step">边界态 · 时间校验</span></button>
+    <button data-goto="weekly">周报（本周已达标 X 天）<span class="step">最短路径 · 第 3 步</span></button>
+  </div>
+  <p class="tip">点击手机内的按钮、弹窗、底部 Tab 也可跳转，体验完整最短路径。</p>
+</nav>
+
+<div class="stage">
+  <div class="phone">
+    <div class="statusbar"><span id="clock">19:30</span><span class="icons">●●●●● 5G ▮</span></div>
+    <div class="navbar" id="navbar">健身打卡</div>
+
+    <!-- 页面 1：首页（有历史数据） -->
+    <section class="screen active" id="screen-home">
+      <div class="page-inner">
+        <p class="date-text" id="dateHome">11月7日 周五</p>
+        <h2 class="hero-title">已连续打卡 <span class="num">3</span> 天</h2>
+        <p class="hero-sub">记录起止时间，养成规律健身习惯</p>
+
+        <div class="card status-card">
+          <p class="status-title">今日打卡</p>
+          <div class="status-row">
+            <div class="status-item">
+              <span class="status-label">开始时间</span>
+              <span class="status-time">07:10</span>
+            </div>
+            <div class="status-divider"></div>
+            <div class="status-item">
+              <span class="status-label">结束时间</span>
+              <span class="status-time empty">--:--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="action-btn action-start" onclick="openModal('start')">
+            <span class="label">今天几点开始健身</span>
+            <span class="value">已打卡 07:10</span>
+          </div>
+          <div class="action-btn action-end" onclick="openModal('end')">
+            <span class="label">几点结束健身</span>
+            <span class="value">去打卡</span>
+          </div>
+        </div>
+        <p class="rule-tip">当天 23:00 后打卡无效</p>
+      </div>
+    </section>
+
+    <!-- 页面 2：首页（首次无数据） -->
+    <section class="screen" id="screen-home-empty">
+      <div class="page-inner">
+        <p class="date-text" id="dateEmpty">11月7日 周五</p>
+        <h2 class="hero-title">今天开始</h2>
+        <p class="hero-sub">记录起止时间，养成规律健身习惯</p>
+
+        <div class="card status-card">
+          <p class="status-title">今日打卡</p>
+          <div class="status-row">
+            <div class="status-item">
+              <span class="status-label">开始时间</span>
+              <span class="status-time empty">--:--</span>
+            </div>
+            <div class="status-divider"></div>
+            <div class="status-item">
+              <span class="status-label">结束时间</span>
+              <span class="status-time empty">--:--</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <div class="action-btn action-start" onclick="openModal('start')">
+            <span class="label">今天几点开始健身</span>
+            <span class="value">去打卡</span>
+          </div>
+          <div class="action-btn action-end" onclick="openModal('end')">
+            <span class="label">几点结束健身</span>
+            <span class="value">去打卡</span>
+          </div>
+        </div>
+        <p class="rule-tip">当天 23:00 后打卡无效</p>
+      </div>
+    </section>
+
+    <!-- 页面 3：周报 -->
+    <section class="screen" id="screen-weekly">
+      <div class="page-inner">
+        <div class="card hero-card">
+          <span class="hero-label">本周已达标</span>
+          <div class="hero-number-row">
+            <span class="hero-number">4</span>
+            <span class="hero-unit">天</span>
+          </div>
+          <span class="hero-range" id="weekRange">11月3日 - 11月9日</span>
+          <div class="progress-row">
+            <div class="progress-track"><div class="progress-fill" style="width:57%"></div></div>
+            <span class="progress-text">4/7 天</span>
+          </div>
+        </div>
+
+        <div class="card week-card">
+          <p class="week-title">本周打卡</p>
+          <div class="week-grid" id="weekGrid"></div>
+        </div>
+
+        <div class="card rule-card">
+          <p class="rule-title">达标规则</p>
+          <div class="rule-item"><span class="rule-bullet"></span><span class="rule-text">当天完成「开始 + 结束」两次打卡，记为达标 1 天</span></div>
+          <div class="rule-item"><span class="rule-bullet"></span><span class="rule-text">打卡时间晚于当日 23:00 判定无效，请次日再打卡</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 底部 TabBar -->
+    <div class="tabbar">
+      <div class="tab-item active" id="tab-home" onclick="goScreen('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6.5 6.5v11"/><path d="M17.5 6.5v11"/><path d="M3.5 9.5v5"/><path d="M20.5 9.5v5"/><path d="M6.5 12h11"/>
+        </svg>
+        <span>打卡</span>
+      </div>
+      <div class="tab-item" id="tab-weekly" onclick="goScreen('weekly')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 20h16"/><path d="M8 20v-5"/><path d="M12 20V7"/><path d="M16 20v-8"/>
+        </svg>
+        <span>周报</span>
+      </div>
+    </div>
+
+    <!-- 弹窗 1：时间确认（开始/结束共用） -->
+    <div class="overlay" id="overlay-picker">
+      <div class="mask" onclick="closeOverlay('overlay-picker')"></div>
+      <div class="modal-card">
+        <p class="modal-title" id="pickerTitle">确认开始时间</p>
+        <div class="time-row" onclick="cycleTime()">
+          <span class="time-value" id="pickerTime">19:30</span>
+          <span class="time-edit">点击调整</span>
+        </div>
+        <p class="modal-desc">已默认填入当前时间，可手动修改</p>
+        <div class="modal-actions">
+          <div class="btn btn-cancel" onclick="closeOverlay('overlay-picker')">取消</div>
+          <div class="btn btn-confirm" onclick="confirmCheckin()">确认打卡</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 弹窗 2：23 点后无效提示 -->
+    <div class="overlay" id="overlay-invalid">
+      <div class="mask" onclick="closeOverlay('overlay-invalid')"></div>
+      <div class="modal-card">
+        <p class="modal-title">打卡无效</p>
+        <p class="invalid-text">已超过当日23点，本次打卡无效。<br/>好好休息，明天再来打卡吧</p>
+        <div class="modal-actions">
+          <div class="btn btn-ok" onclick="closeOverlay('overlay-invalid')">知道了</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ===== 假数据 =====
+  var now = new Date();
+  var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+  var nowTime = pad(now.getHours()) + ':' + pad(now.getMinutes());
+  document.getElementById('clock').textContent = nowTime;
+  document.getElementById('pickerTime').textContent = nowTime;
+
+  // 日期文案
+  var weekNames = ['周日','周一','周二','周三','周四','周五','周六'];
+  var dateText = (now.getMonth() + 1) + '月' + now.getDate() + '日 ' + weekNames[now.getDay()];
+  document.getElementById('dateHome').textContent = dateText;
+  document.getElementById('dateEmpty').textContent = dateText;
+
+  // 本周日期（周一 ~ 周日）
+  var monday = new Date(now);
+  monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+  var weekDates = [];
+  for (var i = 0; i < 7; i++) {
+    var d = new Date(monday);
+    d.setDate(monday.getDate() + i);
+    weekDates.push(d);
+  }
+  document.getElementById('weekRange').textContent =
+    (weekDates[0].getMonth() + 1) + '月' + weekDates[0].getDate() + '日 - ' +
+    (weekDates[6].getMonth() + 1) + '月' + weekDates[6].getDate() + '日';
+
+  // 周视图假数据：前 4 天达标，今天高亮
+  var weekLabels = ['一','二','三','四','五','六','日'];
+  var todayStr = now.toDateString();
+  var grid = document.getElementById('weekGrid');
+  var html = '';
+  for (var j = 0; j < 7; j++) {
+    var d2 = weekDates[j];
+    var isToday = d2.toDateString() === todayStr;
+    var qualified = j < 4; // 假数据：周一~周四达标
+    var dotClass = qualified ? 'qualified' : (isToday ? 'today' : 'plain');
+    html += '<div class="day-item">' +
+      '<span class="day-label">' + weekLabels[j] + '</span>' +
+      '<div class="day-dot ' + dotClass + '">' + (qualified ? '✓' : '') + '</div>' +
+      '<span class="day-num' + (isToday ? ' today' : '') + '">' + d2.getDate() + '日</span>' +
+      '</div>';
+  }
+  grid.innerHTML = html;
+
+  // ===== 页面跳转 =====
+  var navButtons = document.querySelectorAll('.proto-nav button');
+
+  function setNav(key) {
+    navButtons.forEach(function (b) { b.classList.toggle('active', b.dataset.goto === key); });
+  }
+
+  function goScreen(name) {
+    closeAllOverlays();
+    document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+    document.getElementById('screen-' + name).classList.add('active');
+    var isWeekly = name === 'weekly';
+    document.getElementById('navbar').textContent = isWeekly ? '周报' : '健身打卡';
+    document.getElementById('tab-home').classList.toggle('active', !isWeekly);
+    document.getElementById('tab-weekly').classList.toggle('active', isWeekly);
+    setNav(name);
+  }
+
+  // ===== 弹窗逻辑 =====
+  var pickerField = 'start';
+  var demoTimes = null;
+
+  function openModal(field) {
+    pickerField = field;
+    document.getElementById('pickerTitle').textContent = field === 'start' ? '确认开始时间' : '确认结束时间';
+    document.getElementById('pickerTime').textContent = nowTime;
+    demoTimes = null;
+    document.getElementById('overlay-picker').classList.add('show');
+    setNav('modal');
+  }
+
+  // 原型演示：点击时间循环切换（含 23:30 用于演示无效场景）
+  function cycleTime() {
+    if (!demoTimes) demoTimes = [nowTime, '18:45', '20:10', '23:30'];
+    var cur = document.getElementById('pickerTime').textContent;
+    var idx = demoTimes.indexOf(cur);
+    document.getElementById('pickerTime').textContent = demoTimes[(idx + 1) % demoTimes.length];
+  }
+
+  function confirmCheckin() {
+    var time = document.getElementById('pickerTime').textContent;
+    closeOverlay('overlay-picker');
+    // 时间校验：晚于 23:00 → 无效提示；否则 → 跳转周报（最短路径第 3 步）
+    if (time > '23:00') {
+      document.getElementById('overlay-invalid').classList.add('show');
+      setNav('invalid');
+    } else {
+      goScreen('weekly');
+    }
+  }
+
+  function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+  function closeAllOverlays() { document.querySelectorAll('.overlay').forEach(function (o) { o.classList.remove('show'); }); }
+
+  // ===== 左侧导航 =====
+  navButtons.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var key = b.dataset.goto;
+      if (key === 'modal') { goScreen('home'); openModal('start'); }
+      else if (key === 'invalid') { goScreen('home'); document.getElementById('overlay-invalid').classList.add('show'); setNav('invalid'); }
+      else { goScreen(key); }
+    });
+  });
+</script>
+</body>
+</html>
